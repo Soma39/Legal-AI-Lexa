@@ -1,0 +1,56 @@
+[
+  {
+    "id": "eval-01",
+    "query": "What is the provision for cheating under Bharatiya Nyaya Sanhita and what did it replace?",
+    "topic": "Criminal Law Information",
+    "expected_statute": "Bharatiya Nyaya Sanhita, 2023",
+    "expected_section": "Sections 316, 318",
+    "expected_keywords": ["cheating", "318", "420", "IPC"],
+    "review_criteria": "Must correctly identify BNS Section 318 as the replacement for IPC Section 420 and cite the commencement date of 1 July 2024."
+  },
+  {
+    "id": "eval-02",
+    "query": "How can a citizen register a Zero FIR under the new criminal procedure code in India?",
+    "topic": "Criminal Law Information",
+    "expected_statute": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+    "expected_section": "Section 173",
+    "expected_keywords": ["173", "Zero FIR", "CrPC", "154"],
+    "review_criteria": "Must cite BNSS Section 173 replacing CrPC 154, permitting registration irrespective of territorial jurisdiction."
+  },
+  {
+    "id": "eval-03",
+    "query": "What are the consumer redressal commission pecuniary jurisdictions under Consumer Protection Act 2019?",
+    "topic": "Consumer Rights",
+    "expected_statute": "Consumer Protection Act, 2019",
+    "expected_section": "Sections 2(7), 2(47), 34, 35",
+    "expected_keywords": ["District Commission", "State Commission", "National Commission", "e-Daakhil"],
+    "review_criteria": "Must mention District, State, and National Commission tiers and the 2-year limitation period."
+  },
+  {
+    "id": "eval-04",
+    "query": "How are electronic digital records admitted as evidence under Bharatiya Sakshya Adhiniyam 2023?",
+    "topic": "Criminal Law Information",
+    "expected_statute": "Bharatiya Sakshya Adhiniyam, 2023",
+    "expected_section": "Sections 61, 62, 63",
+    "expected_keywords": ["63", "electronic records", "65B", "certificate"],
+    "review_criteria": "Must identify BSA Section 63 corresponding to the former Section 65B of the Indian Evidence Act, 1872."
+  },
+  {
+    "id": "eval-05",
+    "query": "What notice period is required to terminate a monthly residential tenancy under Indian law?",
+    "topic": "Property and Rental Matters",
+    "expected_statute": "Transfer of Property Act, 1882",
+    "expected_section": "Sections 105, 106, 107, 108",
+    "expected_keywords": ["106", "15 days", "Transfer of Property", "lease"],
+    "review_criteria": "Must cite Section 106 of Transfer of Property Act (15 days notice for non-agricultural leases) and 11-month registration under Registration Act."
+  },
+  {
+    "id": "eval-06",
+    "query": "What is the penalty for online identity theft and impersonation under the IT Act?",
+    "topic": "Cybercrime and Online Fraud",
+    "expected_statute": "Information Technology Act, 2000",
+    "expected_section": "Sections 43, 66C, 66D",
+    "expected_keywords": ["66C", "66D", "identity theft", "1930"],
+    "review_criteria": "Must cite IT Act Sections 66C/66D and reference the National Cybercrime Helpline 1930."
+  }
+]

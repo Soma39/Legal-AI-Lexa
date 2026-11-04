@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: legalai-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-legalai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-legalai_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-legalai_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U legalai -d legalai_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: legalai-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://legalai:legalai_secret@db:5432/legalai_db
+      SECRET_KEY: ${SECRET_KEY:-production_secret_key_change_me_32_characters_minimum}
+      LLM_PROVIDER: ${LLM_PROVIDER:-demo}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      BACKEND_CORS_ORIGINS: "http://localhost,http://localhost:5173,http://localhost:80"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/data:/app/data
+    command: >
+      sh -c "python scripts/ingest_corpus.py &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: legalai-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
