@@ -128,7 +128,21 @@ async def send_message(
     clean_content = sanitize_input(msg_in.content)
     jurisdiction = sanitize_input(msg_in.jurisdiction) or conv.jurisdiction or "India"
 
-    # 1. Save user question message
+    # 1. Fetch preceding conversational history for multi-turn dialogue context
+    prior_messages = (
+        db.query(Message)
+        .filter(Message.conversation_id == conv.id)
+        .order_by(Message.created_at.desc())
+        .limit(6)
+        .all()
+    )
+    prior_messages.reverse()
+    conversation_context = [
+        {"role": "user" if m.sender == "user" else "assistant", "content": m.content}
+        for m in prior_messages
+    ]
+
+    # 2. Save user question message
     user_msg = Message(
         conversation_id=conv.id,
         sender="user",
@@ -138,10 +152,11 @@ async def send_message(
     db.add(user_msg)
     db.flush()
 
-    # 2. Run RAG Pipeline
+    # 3. Run RAG Pipeline with conversational memory
     rag_result = await rag_service.answer_question(
         query=clean_content,
-        jurisdiction=jurisdiction
+        jurisdiction=jurisdiction,
+        conversation_context=conversation_context
     )
 
     # Auto-update conversation title if still default

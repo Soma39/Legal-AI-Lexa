@@ -285,20 +285,40 @@ def seed_knowledge_graph(db):
         {"name": "Bharatiya Nagarik Suraksha Sanhita, 2023", "type": "Act", "statute": "BNSS, 2023", "desc": "Procedural criminal code of India replacing CrPC 1973, effective 1 July 2024."},
         {"name": "Code of Criminal Procedure, 1973", "type": "Act", "statute": "CrPC, 1973", "desc": "Historical procedural criminal code of India, repealed by BNSS 2023."},
         {"name": "Bharatiya Sakshya Adhiniyam, 2023", "type": "Act", "statute": "BSA, 2023", "desc": "Law of evidence in India replacing Indian Evidence Act 1872, effective 1 July 2024."},
+        {"name": "Indian Evidence Act, 1872", "type": "Act", "statute": "IEA, 1872", "desc": "Colonial law of evidence in India, repealed by BSA 2023 on 1 July 2024."},
         {"name": "Consumer Protection Act, 2019", "type": "Act", "statute": "CPA, 2019", "desc": "Statute governing consumer rights, unfair trade practices, and consumer dispute redressal commissions."},
         {"name": "Information Technology Act, 2000", "type": "Act", "statute": "IT Act, 2000", "desc": "Legal recognition for electronic transactions, cybercrime penalties, and electronic evidence."},
         {"name": "Indian Contract Act, 1872", "type": "Act", "statute": "Contract Act, 1872", "desc": "Governs the law of contracts, agreements, consideration, and breach remedies in India."},
         {"name": "Transfer of Property Act, 1882", "type": "Act", "statute": "TPA, 1882", "desc": "Governs transfer of property and leases/tenancy in India."},
+        {"name": "Registration Act, 1908", "type": "Act", "statute": "Registration Act, 1908", "desc": "Mandates compulsory registration of leases exceeding 11 months under Section 17."},
+        {"name": "Negotiable Instruments Act, 1881", "type": "Act", "statute": "NI Act, 1881", "desc": "Governs cheques, promissory notes, and criminal liability for cheque dishonour under Section 138."},
         {"name": "Digital Personal Data Protection Act, 2023", "type": "Act", "statute": "DPDP, 2023", "desc": "Comprehensive digital privacy and data protection regulation in India."},
+        {"name": "Real Estate (Regulation and Development) Act, 2016", "type": "Act", "statute": "RERA, 2016", "desc": "Homebuyer protection, developer project registration, and redressal for possession delays under Section 18."},
+        {"name": "Protection of Women from Domestic Violence Act, 2005", "type": "Act", "statute": "PWDVA, 2005", "desc": "Provides immediate protection, residence orders, and monetary relief for aggrieved women."},
+        {"name": "Right to Information Act, 2005", "type": "Act", "statute": "RTI Act, 2005", "desc": "Provides citizen access to public authority records within 30-day statutory timeline."},
+        {"name": "Motor Vehicles Act, 1988", "type": "Act", "statute": "MVA, 1988", "desc": "Governs road safety, accident compensation claims before MACT, and hit-and-run relief."},
+        {"name": "Legal Services Authorities Act, 1987", "type": "Act", "statute": "LSAA, 1987", "desc": "Enforces constitutional mandate for free legal aid under Article 39A via NALSA/SLSA/DLSA."},
+
         # Sections
         {"name": "BNS Section 318 (Cheating)", "type": "Section", "statute": "BNS, 2023", "section_number": "318", "desc": "Cheating and dishonestly inducing delivery of property (replaces IPC 420)."},
         {"name": "BNS Section 316 (Breach of Trust)", "type": "Section", "statute": "BNS, 2023", "section_number": "316", "desc": "Criminal breach of trust (replaces IPC 405/406)."},
-        {"name": "BNSS Section 173 (FIR & Zero FIR)", "type": "Section", "statute": "BNSS, 2023", "section_number": "173", "desc": "Registration of cognizable offences, Zero FIR, and e-FIR (replaces CrPC 154)."},
+        {"name": "BNS Section 303 (Theft)", "type": "Section", "statute": "BNS, 2023", "section_number": "303", "desc": "Theft and penalty; community service for first-time offenders under Rs. 5000 (replaces IPC 379)."},
+        {"name": "BNS Section 304 (Snatching)", "type": "Section", "statute": "BNS, 2023", "section_number": "304", "desc": "Newly codified criminal offence for sudden forcible grabbing of property."},
+        {"name": "BNS Section 103 (Murder & Mob Lynching)", "type": "Section", "statute": "BNS, 2023", "section_number": "103", "desc": "Capital punishment or life imprisonment for murder and group hate lynchings (replaces IPC 302)."},
+        {"name": "BNS Section 106 (Hit and Run)", "type": "Section", "statute": "BNS, 2023", "section_number": "106", "desc": "Causing death by rash/negligent driving with up to 10 years imprisonment for fleeing scene."},
+        {"name": "BNS Section 356 (Defamation)", "type": "Section", "statute": "BNS, 2023", "section_number": "356", "desc": "Defamation with community service or imprisonment up to 2 years (replaces IPC 499/500)."},
+        {"name": "BNSS Section 173 (FIR & Zero FIR)", "type": "Section", "statute": "BNSS, 2023", "section_number": "173", "desc": "Registration of cognizable offences, statutory Zero FIR anywhere in India, and e-FIR (replaces CrPC 154)."},
+        {"name": "BNSS Section 35 (Arrest Conditions)", "type": "Section", "statute": "BNSS, 2023", "section_number": "35", "desc": "Mandatory notice of appearance for offences under 7 years and arrest safeguards (replaces CrPC 41/41A)."},
+        {"name": "BNSS Section 105 (Mandatory Videography)", "type": "Section", "statute": "BNSS, 2023", "section_number": "105", "desc": "Mandatory electronic audio-video recording of search and seizure operations."},
+        {"name": "BNSS Section 479 (Undertrial Relief)", "type": "Section", "statute": "BNSS, 2023", "section_number": "479", "desc": "Mandatory bail for first-time offenders detained for 1/3rd of maximum sentence (replaces CrPC 436A)."},
         {"name": "BNSS Section 482 (Anticipatory Bail)", "type": "Section", "statute": "BNSS, 2023", "section_number": "482", "desc": "Anticipatory bail applications before Session Court / High Court (replaces CrPC 438)."},
-        {"name": "BSA Section 63 (Electronic Evidence)", "type": "Section", "statute": "BSA, 2023", "section_number": "63", "desc": "Admissibility and certification of electronic records (replaces IEA 65B)."},
-        {"name": "IT Act Section 66D (Cheating by Personation)", "type": "Section", "statute": "IT Act, 2000", "section_number": "66D", "desc": "Punishment for cheating by personation by using computer resources."},
+        {"name": "BSA Section 63 (Electronic Evidence)", "type": "Section", "statute": "BSA, 2023", "section_number": "63", "desc": "Admissibility and electronic certificate requirement for digital records (replaces IEA 65B)."},
+        {"name": "IT Act Section 66D (Cheating by Personation)", "type": "Section", "statute": "IT Act, 2000", "section_number": "66D", "desc": "Punishment for online fraud, phishing, and personation using computer resources."},
         {"name": "Contract Act Section 73 (Breach Compensation)", "type": "Section", "statute": "Contract Act, 1872", "section_number": "73", "desc": "Compensation for loss or damage caused by breach of contract."},
-        {"name": "TPA Section 106 (Lease Notice)", "type": "Section", "statute": "TPA, 1882", "section_number": "106", "desc": "Statutory notice periods for termination of leases and tenancy."}
+        {"name": "TPA Section 106 (Lease Notice)", "type": "Section", "statute": "TPA, 1882", "section_number": "106", "desc": "Statutory notice periods (15 days for residential, 6 months for manufacturing/agricultural)."},
+        {"name": "NI Act Section 138 (Cheque Bounce)", "type": "Section", "statute": "NI Act, 1881", "section_number": "138", "desc": "Criminal liability for dishonour of cheque with up to 2 years imprisonment and double fine."},
+        {"name": "DPDP Section 12 (Right to Erasure)", "type": "Section", "statute": "DPDP, 2023", "section_number": "12", "desc": "Right of Data Principal to erasure of personal data (Right to be Forgotten)."},
+        {"name": "RERA Section 18 (Delayed Possession)", "type": "Section", "statute": "RERA, 2016", "section_number": "18", "desc": "Statutory refund with interest or monthly delay interest for delayed handover of flats."}
     ]
 
     node_map = {}
@@ -322,14 +342,27 @@ def seed_knowledge_graph(db):
     edges_data = [
         ("Bharatiya Nyaya Sanhita, 2023", "Indian Penal Code, 1860", "REPLACES", "BNS 2023 came into force on 1 July 2024 repealing IPC 1860", "India Code Notification No. S.O. 850(E)"),
         ("Bharatiya Nagarik Suraksha Sanhita, 2023", "Code of Criminal Procedure, 1973", "REPLACES", "BNSS 2023 came into force on 1 July 2024 repealing CrPC 1973", "India Code Notification No. S.O. 848(E)"),
+        ("Bharatiya Sakshya Adhiniyam, 2023", "Indian Evidence Act, 1872", "REPLACES", "BSA 2023 came into force on 1 July 2024 repealing Evidence Act 1872", "India Code Notification No. S.O. 849(E)"),
         ("Bharatiya Sakshya Adhiniyam, 2023", "Information Technology Act, 2000", "REFERENCES", "BSA 2023 harmonizes digital evidence admissibility with IT Act provisions", "BSA 2023 Section 61-63"),
         ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 318 (Cheating)", "CONTAINS", "BNS Chapter XVII contains Section 318 for cheating and fraud", "Act No. 45 of 2023"),
         ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 316 (Breach of Trust)", "CONTAINS", "BNS Chapter XVII defines Criminal Breach of Trust", "Act No. 45 of 2023"),
-        ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 173 (FIR & Zero FIR)", "CONTAINS", "BNSS Section 173 governs FIR and Zero FIR", "Act No. 46 of 2023"),
+        ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 303 (Theft)", "CONTAINS", "BNS Section 303 codifies theft with community service option", "Act No. 45 of 2023"),
+        ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 304 (Snatching)", "CONTAINS", "BNS Section 304 creates explicit snatching offence", "Act No. 45 of 2023"),
+        ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 103 (Murder & Mob Lynching)", "CONTAINS", "BNS Section 103 prescribes murder and mob lynching penalties", "Act No. 45 of 2023"),
+        ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 106 (Hit and Run)", "CONTAINS", "BNS Section 106 prescribes penalties for negligent driving and hit-and-run", "Act No. 45 of 2023"),
+        ("Bharatiya Nyaya Sanhita, 2023", "BNS Section 356 (Defamation)", "CONTAINS", "BNS Section 356 defines defamation with community service alternative", "Act No. 45 of 2023"),
+        ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 173 (FIR & Zero FIR)", "CONTAINS", "BNSS Section 173 governs FIR, Zero FIR, and e-FIR", "Act No. 46 of 2023"),
+        ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 35 (Arrest Conditions)", "CONTAINS", "BNSS Section 35 regulates arrest without warrant", "Act No. 46 of 2023"),
+        ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 105 (Mandatory Videography)", "CONTAINS", "BNSS Section 105 requires electronic recording of searches", "Act No. 46 of 2023"),
+        ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 479 (Undertrial Relief)", "CONTAINS", "BNSS Section 479 grants statutory bail for 1/3rd sentence undertrials", "Act No. 46 of 2023"),
         ("Bharatiya Nagarik Suraksha Sanhita, 2023", "BNSS Section 482 (Anticipatory Bail)", "CONTAINS", "BNSS Section 482 establishes anticipatory bail procedures", "Act No. 46 of 2023"),
         ("Information Technology Act, 2000", "IT Act Section 66D (Cheating by Personation)", "CONTAINS", "Chapter XI of IT Act defines online cheating offences", "Act No. 21 of 2000"),
         ("Indian Contract Act, 1872", "Contract Act Section 73 (Breach Compensation)", "CONTAINS", "Chapter VI provides remedies for breach of contract", "Act No. 9 of 1872"),
-        ("Transfer of Property Act, 1882", "TPA Section 106 (Lease Notice)", "CONTAINS", "Chapter V governs leases of immovable property and eviction notice", "Act No. 4 of 1882")
+        ("Transfer of Property Act, 1882", "TPA Section 106 (Lease Notice)", "CONTAINS", "Chapter V governs leases of immovable property and eviction notice", "Act No. 4 of 1882"),
+        ("Transfer of Property Act, 1882", "Registration Act, 1908", "REFERENCES", "Section 107 TPA requires registration under Registration Act Section 17", "Act No. 16 of 1908"),
+        ("Negotiable Instruments Act, 1881", "NI Act Section 138 (Cheque Bounce)", "CONTAINS", "Chapter XVII penalizes dishonour of cheques for insufficiency of funds", "Act No. 26 of 1881"),
+        ("Digital Personal Data Protection Act, 2023", "DPDP Section 12 (Right to Erasure)", "CONTAINS", "Chapter III guarantees Data Principal rights including Right to be Forgotten", "Act No. 22 of 2023"),
+        ("Real Estate (Regulation and Development) Act, 2016", "RERA Section 18 (Delayed Possession)", "CONTAINS", "Chapter III mandates developer compensation for delayed possession", "Act No. 16 of 2016")
     ]
 
     for src_name, tgt_name, rel, desc, src_ref in edges_data:

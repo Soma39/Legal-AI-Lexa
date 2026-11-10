@@ -58,18 +58,23 @@ def sanitize_input(text: str) -> str:
 
 
 def get_current_user(
+    request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> User:
-    """Authenticate request using JWT token and retrieve the user."""
-    if not token:
+    """Authenticate request using JWT token (Authorization header or query param) and retrieve user."""
+    auth_token = token
+    if not auth_token:
+        auth_token = request.query_params.get("token")
+
+    if not auth_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication credentials were not provided",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    user_id = decode_access_token(token)
+    user_id = decode_access_token(auth_token)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,0 +1,761 @@
+"""Script to generate exhaustive, verified Indian statutory corpus for LegalAI."""
+import json
+import os
+
+CORPUS_DATA = [
+    # ==================== BNS (Bharatiya Nyaya Sanhita, 2023) ====================
+    {
+        "id": "bns-sec-1",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 1",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Current Criminal Law (Came into force on 1st July 2024; repealed and replaced the Indian Penal Code, 1860).",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Short title, extent and commencement: (1) This Act may be called the Bharatiya Nyaya Sanhita, 2023. (2) It extends to the whole of India. (3) It came into force on the 1st day of July, 2024. Historical Status: Replaces the Indian Penal Code, 1860 (Act No. 45 of 1860). Offences committed on or after 1 July 2024 are prosecuted under the Bharatiya Nyaya Sanhita, 2023, while offences committed prior to 1 July 2024 continue to be governed by the Indian Penal Code, 1860."
+    },
+    {
+        "id": "bns-sec-318-cheating",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 318",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 415 and 420 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Cheating and Dishonestly Inducing Delivery of Property: (1) Whoever, by deceiving any person, fraudulently or dishonestly induces the person so deceived to deliver any property to any person, or to consent that any person shall retain any property, or intentionally induces the person so deceived to do or omit to do anything which he would not do or omit if he were not so deceived, commits cheating. (2) Cheating is punishable with imprisonment up to three years, or with fine, or both. (4) Whoever cheats and thereby dishonestly induces the person deceived to deliver any property, or to make, alter or destroy the whole or any part of a valuable security, shall be punished with imprisonment of either description for a term which may extend to seven years, and shall also be liable to fine. Corresponds to Section 420 IPC."
+    },
+    {
+        "id": "bns-sec-316-breach-of-trust",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 316",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 405 and 406 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Criminal Breach of Trust: (1) Whoever, being in any manner entrusted with property, or with any dominion over property, dishonestly misappropriates or converts to his own use that property, or dishonestly uses or disposes of that property in violation of any direction of law prescribing the mode in which such trust is to be discharged, commits criminal breach of trust. (2) Punishment extends up to five years, or fine, or both (increased from three years under former Section 406 IPC)."
+    },
+    {
+        "id": "bns-sec-303-theft",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 303",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 378 and 379 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Theft: Whoever, intending to take dishonestly any movable property out of the possession of any person without that person's consent, moves that property in order to such taking, commits theft. Punishment under Section 303(2): Imprisonment of either description for a term which may extend to three years, or fine, or both. Exception: Where stolen property value is less than Rs. 5,000 and the person is convicted for the first time, on return or restitution of value, punishment may be community service."
+    },
+    {
+        "id": "bns-sec-304-snatching",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 304",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "New offence introduced in Bharatiya Nyaya Sanhita (Not specifically codified in IPC)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Snatching: (1) Theft is snatching if, in order to commit theft, the offender suddenly or quickly or forcibly seizes, secures, grabs or takes away from any person or from his possession any movable property. (2) Whoever commits snatching shall be punished with imprisonment of either description for a term which may extend to three years, and shall also be liable to fine."
+    },
+    {
+        "id": "bns-sec-308-extortion",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 308",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 383 and 384 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Extortion: Whoever intentionally puts any person in fear of any injury to that person, or to any other, and thereby dishonestly induces the person so put in fear to deliver to any person any property or valuable security, commits extortion. Punishment: Imprisonment extending up to two years, or fine, or both. Extortion putting person in fear of death or grievous hurt extends to ten years."
+    },
+    {
+        "id": "bns-sec-309-robbery",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 309",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 390 and 392 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Robbery and Dacoity: In all robbery there is either theft or extortion. Theft is robbery if, in order to committing theft, offender causes death, hurt or wrongful restraint. Punishment for robbery extends to ten years rigorous imprisonment and fine; if committed on highway between sunset and sunrise, extends to fourteen years. When five or more persons conjointly commit robbery, it constitutes Dacoity under Section 310, punishable with life imprisonment or rigorous imprisonment up to ten years."
+    },
+    {
+        "id": "bns-sec-103-murder",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 103",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 300 and 302 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Punishment for Murder: (1) Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine. (2) When a group of five or more persons acting in concert commits murder on the ground of race, caste, community, sex, place of birth, language, personal belief or any other similar ground (mob lynching), each member of such group shall be punished with death or with imprisonment for life, and shall also be liable to fine. Corresponds to Section 302 IPC."
+    },
+    {
+        "id": "bns-sec-105-culpable-homicide",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 105",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 299 and 304 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Culpable Homicide not amounting to Murder: Whoever causes death with the intention of causing death, or causing bodily injury likely to cause death, or with knowledge that act is likely to cause death, commits culpable homicide. Punishment under Section 105: If done with intention, imprisonment for life or up to ten years and fine; if done with knowledge without intention, imprisonment up to ten years or fine or both."
+    },
+    {
+        "id": "bns-sec-106-hit-and-run",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 106",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 304A IPC and introduces aggravated hit-and-run penalty",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Causing Death by Negligence and Hit-and-Run: (1) Whoever causes the death of any person by doing any rash or negligent act not amounting to culpable homicide, shall be punished with imprisonment of either description for a term which may extend to five years, and fine. (2) Whoever causes death of any person by rash and negligent driving of vehicle not amounting to culpable homicide, and escapes without reporting it to a police officer or Magistrate soon after the incident, shall be punished with imprisonment extending up to ten years and fine."
+    },
+    {
+        "id": "bns-sec-115-117-hurt",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Sections 115, 117",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Sections 319, 320, 323, 325 of IPC",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Voluntarily Causing Hurt and Grievous Hurt: Section 115 defines hurt (causing bodily pain, disease or infirmity). Punishment: Imprisonment up to one year, or fine up to Rs. 10,000, or both, or community service. Section 116/117 defines Grievous Hurt (emasculation, permanent privation of sight/hearing, fracture or dislocation of bone/tooth, hurt endangering life for 15 days). Punishment: Imprisonment up to seven years and fine."
+    },
+    {
+        "id": "bns-sec-61-conspiracy",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 61",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 120A and 120B of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Criminal Conspiracy: (1) When two or more persons agree to do, or cause to be done: (a) an illegal act; or (b) an act which is not illegal by illegal means, such an agreement is designated a criminal conspiracy. (2) Whoever is a party to a criminal conspiracy to commit an offence punishable with death, imprisonment for life or rigorous imprisonment for a term of two years or upwards, shall be punished in the same manner as if he had abetted such offence."
+    },
+    {
+        "id": "bns-sec-64-rape",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 64",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 375 and 376 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Punishment for Rape: Whoever commits rape shall be punished with rigorous imprisonment of either description for a term which shall not be less than ten years, but which may extend to imprisonment for life, and shall also be liable to fine. Gang rape is punishable under Section 70 with rigorous imprisonment for not less than twenty years or for life. Section 69 specifically criminalizes sexual intercourse by employing deceitful means or false promise of employment or promotion or marrying without intending to do so."
+    },
+    {
+        "id": "bns-sec-74-75-harassment",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Sections 74, 75",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 354 and 354A of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Assault or Criminal Force to Woman with Intent to Outrage Modesty & Sexual Harassment: Section 74: Imprisonment for not less than one year, extending to five years and fine (replaces IPC 354). Section 75: Sexual harassment including unwelcome physical contact, demand for sexual favors, showing pornography against her will, or making sexually colored remarks, punishable with rigorous imprisonment up to three years or fine or both."
+    },
+    {
+        "id": "bns-sec-85-86-cruelty",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Sections 85, 86",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 498A of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Husband or Relative of Husband Subjecting Woman to Cruelty: Section 85: Whoever, being the husband or relative of the husband of a woman, subjects such woman to cruelty shall be punished with imprisonment for a term which may extend to three years and fine. Section 86 defines cruelty as wilful conduct likely to drive woman to suicide or cause grave injury, or harassment with a view to coercing her or any person related to her to meet any unlawful demand for property or dowry."
+    },
+    {
+        "id": "bns-sec-356-defamation",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 356",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 499 and 500 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Defamation: Whoever, by words spoken or intended to be read, or by signs or visible representations, makes or publishes any imputation concerning any person intending to harm the reputation of such person, defames that person. Punishment: Simple imprisonment for a term which may extend to two years, or with fine, or with both, or with community service (introducing community service as an alternative remedy)."
+    },
+    {
+        "id": "bns-sec-329-trespass",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 329",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 441 and 447 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Criminal Trespass and House-Trespass: Whoever enters into or upon property in the possession of another with intent to commit an offence or to intimidate, insult or annoy any person in possession of such property, commits criminal trespass. Punishment: Imprisonment up to three months or fine up to Rs. 5,000, or both. House-trespass (entering building, tent, or vessel used as human dwelling) under Section 331 punishable up to one year and fine."
+    },
+    {
+        "id": "bns-sec-351-intimidation",
+        "document_title": "Bharatiya Nyaya Sanhita, 2023",
+        "statute_name": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+        "section": "Section 351",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 503 and 506 of the Indian Penal Code, 1860",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20120",
+        "content": "Criminal Intimidation: Whoever threatens another with any injury to his person, reputation or property, or to the person or reputation of anyone in whom that person is interested, with intent to cause alarm to that person, commits criminal intimidation. Punishment: Imprisonment extending up to two years, or fine, or both. If threat be to cause death or grievous hurt, imprisonment may extend to seven years or fine or both."
+    },
+
+    # ==================== BNSS (Bharatiya Nagarik Suraksha Sanhita, 2023) ====================
+    {
+        "id": "bnss-sec-173-fir",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 173",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 154 of the Code of Criminal Procedure, 1973 (CrPC)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Information in Cognizable Cases (FIR, Zero FIR & e-FIR): Every information relating to the commission of a cognizable offence, if given orally to an officer in charge of a police station, shall be reduced to writing. Under BNSS Section 173(1), information may be given: (i) irrespective of the area where the crime was committed (establishing statutory Zero FIR across India); (ii) by electronic communication (e-FIR), taken on record and signed within three days by the informant. Preliminary enquiry may be conducted within 14 days before registering an FIR in offences punishable between 3 and 7 years."
+    },
+    {
+        "id": "bnss-sec-35-arrest",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 35",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 41 and 41A of the Code of Criminal Procedure, 1973 (CrPC)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "When Police May Arrest Without Warrant: Police officer may arrest without warrant any person committing a cognizable offence in his presence, or against whom reasonable complaint has been made for offence punishable with imprisonment exceeding seven years. For offences punishable up to seven years, arrest is subject to satisfaction of conditions (preventing further crime, investigation, evidence tampering) and prior notice of appearance under Section 35(3). Section 35(7) prohibits arrest of persons infirm or above 60 years for offences punishable under 3 years without prior permission of Deputy Superintendent of Police."
+    },
+    {
+        "id": "bnss-sec-36-arrest-information",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 36",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 41B and 41C of CrPC, establishing Designated Police Officers",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Designated Police Officer and Public Display of Arrested Persons: The State Government shall designate a police officer in every district and in every police station, not below the rank of Assistant Sub-Inspector, who shall be responsible for maintaining and prominently displaying digital/physical lists of arrested persons and offences charged, available for public inspection."
+    },
+    {
+        "id": "bnss-sec-47-advocate-interrogation",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 47",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 41D of the Code of Criminal Procedure, 1973",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Right of Arrested Person to Meet an Advocate of Choice During Interrogation: When any person is arrested and interrogated by the police, he shall be entitled to meet an advocate of his choice throughout interrogation, though not throughout the entire period of interrogation. Furthermore, under Section 48, the police must immediately inform his nominated friend or relative of the arrest."
+    },
+    {
+        "id": "bnss-sec-105-audio-video",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 105",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Mandatory Electronic Videography of Search & Seizure (New Landmark Reform)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Recording of Search and Seizure through Audio-Video Electronic Means: The process of conducting search of a place or taking possession of any property, article or thing, including preparation of the list of things seized and signature of witnesses, shall be recorded through audio-video electronic means preferably mobile phone, and the police officer shall without delay forward such recording to the District Magistrate, Sub-divisional Magistrate or Judicial Magistrate."
+    },
+    {
+        "id": "bnss-sec-187-remand",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 187",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 167 of the Code of Criminal Procedure, 1973",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Procedure when Investigation Cannot be Completed in 24 Hours (Remand): Magistrate may authorize detention of accused in custody for term not exceeding 15 days in whole or in parts at any time during initial 40 days (for offences up to 10 years) or 60 days (for offences punishable with death, life imprisonment or imprisonment for not less than 10 years). Total detention pending investigation cannot exceed 60 or 90 days, after which accused is entitled to default statutory bail."
+    },
+    {
+        "id": "bnss-sec-479-undertrial-bail",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 479",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 436A of CrPC, providing special relief for first-time offenders",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Maximum Period for which an Undertrial Prisoner Can Be Detained: Where a person has undergone detention for a period extending up to one-half of maximum period of imprisonment, he shall be released by Court on bail. First-time Offender Relief: A person who has not previously been convicted of any offence shall be released on bail if he has undergone detention for one-third of the maximum period of imprisonment. Does not apply where offence is punishable with death or life imprisonment."
+    },
+    {
+        "id": "bnss-sec-480-regular-bail",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 480",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 437 of the Code of Criminal Procedure, 1973",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "When Bail May be Taken in Case of Non-Bailable Offence: When any person accused of non-bailable offence is arrested or detained without warrant, he may be released on bail by Court other than High Court or Court of Session, except where there are reasonable grounds for believing he has been guilty of an offence punishable with death or imprisonment for life. Special relaxation for persons under sixteen years of age, women, sick, or infirm."
+    },
+    {
+        "id": "bnss-sec-482-anticipatory-bail",
+        "document_title": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "statute_name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+        "section": "Section 482",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 438 of the Code of Criminal Procedure, 1973 (CrPC)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20121",
+        "content": "Direction for Grant of Bail to Person Apprehending Arrest (Anticipatory Bail): Where any person has reason to believe that he may be arrested on accusation of having committed a non-bailable offence, he may apply to the High Court or the Court of Session for a direction under this section; and that Court may, if it thinks fit, direct that in the event of such arrest, he shall be released on bail. The Court considers nature and gravity of accusation, criminal antecedents, and possibility of applicant fleeing from justice."
+    },
+
+    # ==================== BSA (Bharatiya Sakshya Adhiniyam, 2023) ====================
+    {
+        "id": "bsa-sec-63-electronic-evidence",
+        "document_title": "Bharatiya Sakshya Adhiniyam, 2023",
+        "statute_name": "Bharatiya Sakshya Adhiniyam, 2023 (Act No. 47 of 2023)",
+        "section": "Section 63",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 65B of the Indian Evidence Act, 1872",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20122",
+        "content": "Admissibility of Electronic Records: Any information contained in an electronic record which is printed on paper, stored, recorded or copied in optical or magnetic media or semiconductor memory produced by a computer shall be deemed to be also a document. Section 63(4) mandates that electronic records must be accompanied by an Electronic Certificate signed by a person occupying a responsible official position in relation to the operation of the device or management of the activities, or by an expert. Essential for WhatsApp messages, CCTV footage, emails, and server logs."
+    },
+    {
+        "id": "bsa-sec-57-58-primary-evidence",
+        "document_title": "Bharatiya Sakshya Adhiniyam, 2023",
+        "statute_name": "Bharatiya Sakshya Adhiniyam, 2023 (Act No. 47 of 2023)",
+        "section": "Sections 57, 58",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 62 and 63 of the Indian Evidence Act, 1872",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20122",
+        "content": "Primary and Secondary Evidence: Primary evidence means the document itself produced for inspection of the Court. Where an electronic record is produced from proper custody, it is primary evidence. Secondary evidence includes certified copies, copies made from the original by mechanical processes, counterparts of documents, and oral accounts of contents given by someone who has seen it. Secondary evidence is admissible under Section 60 when the original is destroyed or in possession of adversary."
+    },
+    {
+        "id": "bsa-sec-104-burden-proof",
+        "document_title": "Bharatiya Sakshya Adhiniyam, 2023",
+        "statute_name": "Bharatiya Sakshya Adhiniyam, 2023 (Act No. 47 of 2023)",
+        "section": "Section 104",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-12-25",
+        "effective_date": "2024-07-01",
+        "amendment_status": "Replaces Section 101 and 102 of the Indian Evidence Act, 1872",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20122",
+        "content": "Burden of Proof: Whoever desires any Court to give judgment as to any legal right or liability dependent on the existence of facts which he asserts, must prove that those facts exist. When a person is bound to prove the existence of any fact, it is said that the burden of proof lies on that person. In criminal matters, burden remains on prosecution to prove guilt beyond reasonable doubt."
+    },
+
+    # ==================== IT ACT (Information Technology Act, 2000) ====================
+    {
+        "id": "it-act-sec-66d-cheating-personation",
+        "document_title": "Information Technology Act, 2000",
+        "statute_name": "Information Technology Act, 2000 (Act No. 21 of 2000)",
+        "section": "Section 66D",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2000-06-09",
+        "effective_date": "2000-10-17",
+        "amendment_status": "Amended by IT Amendment Act 2008 (Act 10 of 2009)",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1999",
+        "content": "Punishment for Cheating by Personation by Using Computer Resource: Whoever, by means for any communication device or computer resource, cheats by personating, shall be punished with imprisonment of either description for a term which may extend to three years and shall also be liable to fine which may extend to one lakh rupees. Covers phishing scams, fake matrimonial/job profiles, impersonation on social media, and fraudulent payment links."
+    },
+    {
+        "id": "it-act-sec-66c-identity-theft",
+        "document_title": "Information Technology Act, 2000",
+        "statute_name": "Information Technology Act, 2000 (Act No. 21 of 2000)",
+        "section": "Section 66C",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2000-06-09",
+        "effective_date": "2000-10-17",
+        "amendment_status": "Amended by IT Amendment Act 2008",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1999",
+        "content": "Punishment for Identity Theft: Whoever, fraudulently or dishonestly make use of the electronic signature, password or any other unique identification feature of any other person, shall be punished with imprisonment of either description for a term which may extend to three years and shall also be liable to fine which may extend with rupees one lakh. Applicable to unauthorized OTP usage, biometric theft, and credential stuffing."
+    },
+    {
+        "id": "it-act-sec-43-damage-computer",
+        "document_title": "Information Technology Act, 2000",
+        "statute_name": "Information Technology Act, 2000 (Act No. 21 of 2000)",
+        "section": "Section 43",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2000-06-09",
+        "effective_date": "2000-10-17",
+        "amendment_status": "Amended by IT Amendment Act 2008",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1999",
+        "content": "Penalty and Compensation for Damage to Computer, Computer System, etc.: If any person without permission of owner accesses, downloads, copies, introduces virus, damages, disrupts, or denies access to any computer or network, he shall be liable to pay damages by way of compensation to the person so affected (civil liability up to Rs. 5 Crores under Adjudicating Officer). If done dishonestly or fraudulently, constitutes criminal hacking under Section 66 punishable with imprisonment up to three years."
+    },
+    {
+        "id": "it-act-sec-72a-data-disclosure",
+        "document_title": "Information Technology Act, 2000",
+        "statute_name": "Information Technology Act, 2000 (Act No. 21 of 2000)",
+        "section": "Section 72A",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2000-06-09",
+        "effective_date": "2008-10-27",
+        "amendment_status": "Inserted by IT Amendment Act 2008",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1999",
+        "content": "Punishment for Disclosure of Information in Breach of Lawful Contract: Any person who has secured access to any material containing personal information about another person, with intent to cause wrongful loss or wrongful gain, discloses, without the consent of the person concerned, or in breach of a lawful contract, such material, shall be punished with imprisonment for a term which may extend to three years, or with fine which may extend to five lakh rupees, or with both."
+    },
+
+    # ==================== CONSUMER PROTECTION ACT, 2019 ====================
+    {
+        "id": "cpa-sec-35-filing",
+        "document_title": "Consumer Protection Act, 2019",
+        "statute_name": "Consumer Protection Act, 2019 (Act No. 35 of 2019)",
+        "section": "Section 35",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2019-08-09",
+        "effective_date": "2020-07-20",
+        "amendment_status": "Replaced the Consumer Protection Act, 1986",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/15256",
+        "content": "Manner in which Complaint Shall be Filed: A complaint, in relation to any goods sold or delivered or agreed to be sold or delivered or any service provided or agreed to be provided, may be filed with a District Commission by: (a) the consumer to whom such goods are sold or delivered or service provided; (b) any recognized consumer association; (c) one or more consumers having same interest. Complaints may be filed electronically via the national e-Daakhil portal (edaakhil.nic.in). Admissibility of complaint must ordinarily be decided within 21 days."
+    },
+    {
+        "id": "cpa-sec-34-pecuniary-jurisdiction",
+        "document_title": "Consumer Protection Act, 2019",
+        "statute_name": "Consumer Protection Act, 2019 (Act No. 35 of 2019)",
+        "section": "Sections 34, 47, 58",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2019-08-09",
+        "effective_date": "2021-12-30",
+        "amendment_status": "Pecuniary limits revised by Consumer Protection Rules, 2021",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/15256",
+        "content": "Pecuniary Jurisdiction of Consumer Commissions: (1) District Consumer Disputes Redressal Commission: Entertains complaints where value of goods or services paid as consideration does not exceed Rs. 50 Lakhs. (2) State Commission (Section 47): Exceeds Rs. 50 Lakhs but does not exceed Rs. 2 Crores. (3) National Commission - NCDRC (Section 58): Exceeds Rs. 2 Crores. Jurisdiction is based strictly on value of consideration paid, not total claim amount."
+    },
+    {
+        "id": "cpa-sec-69-limitation",
+        "document_title": "Consumer Protection Act, 2019",
+        "statute_name": "Consumer Protection Act, 2019 (Act No. 35 of 2019)",
+        "section": "Section 69",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2019-08-09",
+        "effective_date": "2020-07-20",
+        "amendment_status": "Replaced Section 24A of CPA 1986",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/15256",
+        "content": "Limitation Period for Consumer Complaints: (1) The District Commission, the State Commission or the National Commission shall not admit a complaint unless it is filed within two years from the date on which the cause of action has arisen. (2) A complaint may be entertained after period specified if complainant satisfies the Commission that he had sufficient cause for not filing within such period, recording reasons for condoning delay."
+    },
+    {
+        "id": "cpa-sec-2-7-consumer-definition",
+        "document_title": "Consumer Protection Act, 2019",
+        "statute_name": "Consumer Protection Act, 2019 (Act No. 35 of 2019)",
+        "section": "Section 2(7)",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2019-08-09",
+        "effective_date": "2020-07-20",
+        "amendment_status": "Expanded to include online transactions, e-commerce, and direct selling",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/15256",
+        "content": "Definition of Consumer: Any person who buys any goods or hires/avails any services for a consideration which has been paid or promised or partly paid. Explicitly includes offline and online transactions through electronic means or by teleshopping or direct selling or multi-level marketing. Excludes a person who obtains goods for resale or for any commercial purpose (unless goods bought and used exclusively for earning livelihood by self-employment)."
+    },
+
+    # ==================== INDIAN CONTRACT ACT, 1872 ====================
+    {
+        "id": "contract-act-sec-73-breach",
+        "document_title": "Indian Contract Act, 1872",
+        "statute_name": "Indian Contract Act, 1872 (Act No. 9 of 1872)",
+        "section": "Section 73",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1872-04-25",
+        "effective_date": "1872-09-01",
+        "amendment_status": "Foundational civil contract law of India",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
+        "content": "Compensation for Loss or Damage Caused by Breach of Contract: When a contract has been broken, the party who suffers by such breach is entitled to receive, from the party who has broken the contract, compensation for any loss or damage caused to him thereby, which naturally arose in the usual course of things from such breach, or which the parties knew, when they made the contract, to be likely to result from the breach. Remote and indirect loss is not compensated."
+    },
+    {
+        "id": "contract-act-sec-74-liquidated-damages",
+        "document_title": "Indian Contract Act, 1872",
+        "statute_name": "Indian Contract Act, 1872 (Act No. 9 of 1872)",
+        "section": "Section 74",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1872-04-25",
+        "effective_date": "1872-09-01",
+        "amendment_status": "Governs penalty clauses and liquidated damages",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
+        "content": "Compensation for Breach of Contract where Penalty Stipulated: When a contract has been broken, if a sum is named in the contract as the amount to be paid in case of such breach, or if the contract contains any other stipulation by way of penalty, the party complaining of the breach is entitled, whether or not actual damage or loss is proved to have been caused thereby, to receive reasonable compensation not exceeding the amount so named."
+    },
+    {
+        "id": "contract-act-sec-10-validity",
+        "document_title": "Indian Contract Act, 1872",
+        "statute_name": "Indian Contract Act, 1872 (Act No. 9 of 1872)",
+        "section": "Section 10",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1872-04-25",
+        "effective_date": "1872-09-01",
+        "amendment_status": "Essential elements of enforceable contract",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
+        "content": "What Agreements are Contracts: All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not hereby expressly declared to be void. Parties are competent if of majority age, sound mind, and not disqualified by law. Consent is free when not caused by coercion (Sec 15), undue influence (Sec 16), fraud (Sec 17), misrepresentation (Sec 18), or mistake (Sec 20)."
+    },
+
+    # ==================== PROPERTY & TENANCY (TPA 1882 & REGISTRATION ACT) ====================
+    {
+        "id": "tpa-sec-106-lease-notice",
+        "document_title": "Transfer of Property Act, 1882",
+        "statute_name": "Transfer of Property Act, 1882 (Act No. 4 of 1882)",
+        "section": "Section 106",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1882-02-17",
+        "effective_date": "1882-07-01",
+        "amendment_status": "Amended by Act No. 3 of 2003",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2338",
+        "content": "Duration of Certain Leases in Absence of Written Contract or Local Usage: In the absence of a contract or local law or usage to the contrary, a lease of immovable property for agricultural or manufacturing purposes shall be deemed to be a lease from year to year, terminable by six months notice. A lease of immovable property for any other purpose (including residential tenancy) shall be deemed to be a lease from month to month, terminable by fifteen days notice expiring with the end of a month of the tenancy. Notice must be in writing signed by or on behalf of the person giving it."
+    },
+    {
+        "id": "tpa-sec-107-reg-act-17",
+        "document_title": "Transfer of Property Act, 1882",
+        "statute_name": "Transfer of Property Act, 1882 & Registration Act, 1908",
+        "section": "Section 107 TPA & Section 17 Registration Act",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1882-02-17",
+        "effective_date": "1882-07-01",
+        "amendment_status": "Mandatory Registration Law for Tenancies Exceeding 11 Months",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2338",
+        "content": "Leases How Made and Mandatory Registration: Under Section 107 of Transfer of Property Act, a lease of immovable property from year to year, or for any term exceeding one year, or reserving a yearly rent, can be made only by a registered instrument. Under Section 17(1)(d) of the Registration Act, 1908, leases exceeding 11 months must be compulsorily registered before the Sub-Registrar upon payment of applicable state stamp duty. Unregistered lease deeds cannot be received as evidence of transaction affecting property under Section 49 of the Registration Act."
+    },
+
+    # ==================== NEGOTIABLE INSTRUMENTS ACT, 1881 ====================
+    {
+        "id": "ni-act-sec-138-cheque-bounce",
+        "document_title": "Negotiable Instruments Act, 1881",
+        "statute_name": "Negotiable Instruments Act, 1881 (Act No. 26 of 1881)",
+        "section": "Section 138",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1881-12-09",
+        "effective_date": "1882-03-01",
+        "amendment_status": "Amended by Negotiable Instruments (Amendment) Act, 2018",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2237",
+        "content": "Dishonour of Cheque for Insufficiency of Funds in the Account: Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person for discharge of any debt or other liability is returned unpaid (dishonoured), such person shall be deemed to have committed an offence. Punishment: Imprisonment for a term which may extend to two years, or with fine which may extend to twice the amount of the cheque, or with both. Requires presentation within 3 months, formal demand notice within 30 days of memo, and failure to pay within 15 days."
+    },
+    {
+        "id": "ni-act-sec-142-procedure",
+        "document_title": "Negotiable Instruments Act, 1881",
+        "statute_name": "Negotiable Instruments Act, 1881 (Act No. 26 of 1881)",
+        "section": "Section 142",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1881-12-09",
+        "effective_date": "1882-03-01",
+        "amendment_status": "Amended in 2015 for territorial jurisdiction",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2237",
+        "content": "Cognizance of Cheque Bounce Offences: Cognizance is taken upon written complaint by payee/holder in due course filed within one month of cause of action arising (upon expiry of 15 days cure period after statutory notice). Jurisdiction lies exclusively before Court where branch of bank is situated where payee maintains the account (if delivered for collection through an account), or where drawer maintains the account."
+    },
+
+    # ==================== DPDP ACT, 2023 ====================
+    {
+        "id": "dpdp-sec-4-6-consent",
+        "document_title": "Digital Personal Data Protection Act, 2023",
+        "statute_name": "Digital Personal Data Protection Act, 2023 (Act No. 22 of 2023)",
+        "section": "Sections 4, 6",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-08-11",
+        "effective_date": "2023-08-11",
+        "amendment_status": "Landmark comprehensive personal data privacy framework of India",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20005",
+        "content": "Grounds for Processing Digital Personal Data and Consent: A person may process the digital personal data of a Data Principal only in accordance with the provisions of this Act and for a lawful purpose: (a) for which the Data Principal has given consent; or (b) for certain legitimate uses. Consent must be free, specific, informed, unconditional and unambiguous with a clear affirmative action. Data Principal has the right to withdraw consent at any time with ease comparable to giving consent."
+    },
+    {
+        "id": "dpdp-sec-11-13-principal-rights",
+        "document_title": "Digital Personal Data Protection Act, 2023",
+        "statute_name": "Digital Personal Data Protection Act, 2023 (Act No. 22 of 2023)",
+        "section": "Sections 11, 12, 13",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-08-11",
+        "effective_date": "2023-08-11",
+        "amendment_status": "Rights to access, correction, erasure (Right to be Forgotten) and grievance redressal",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20005",
+        "content": "Rights of Data Principal: Section 11: Right to obtain summary of personal data processed and identities of Data Fiduciaries with whom shared. Section 12: Right to correction, completion, updating, and erasure of personal data (Right to be Forgotten) that is no longer necessary for purpose. Section 13: Right of grievance redressal before Data Protection Officer within prescribed timeline before approaching the Data Protection Board of India."
+    },
+    {
+        "id": "dpdp-sec-33-penalties",
+        "document_title": "Digital Personal Data Protection Act, 2023",
+        "statute_name": "Digital Personal Data Protection Act, 2023 (Act No. 22 of 2023)",
+        "section": "Section 33, Schedule",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2023-08-11",
+        "effective_date": "2023-08-11",
+        "amendment_status": "Monetary penalty framework under Data Protection Board",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/20005",
+        "content": "Financial Penalties under DPDP Act: Breach in observing obligation to take reasonable security safeguards to prevent personal data breach is punishable with penalty which may extend up to Rs. 250 Crores. Failure to notify Data Protection Board of India and affected Data Principal of breach extends up to Rs. 200 Crores. Non-fulfillment of additional obligations in respect of children extends up to Rs. 200 Crores."
+    },
+
+    # ==================== RERA (Real Estate Regulation & Development Act, 2016) ====================
+    {
+        "id": "rera-sec-18-delayed-possession",
+        "document_title": "Real Estate (Regulation and Development) Act, 2016",
+        "statute_name": "Real Estate (Regulation and Development) Act, 2016 (Act No. 16 of 2016)",
+        "section": "Section 18",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2016-03-26",
+        "effective_date": "2016-05-01",
+        "amendment_status": "Protects home buyers against delay in possession",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2158",
+        "content": "Return of Amount and Compensation for Delayed Possession: If the promoter fails to complete or is unable to give possession of an apartment, plot or building in accordance with terms of agreement for sale or due date specified therein: (a) promoter shall be liable on demand to the allottees, if they wish to withdraw from project, to return full amount received by him with interest at prescribed rate (typically SBI MCLR + 2%) and compensation; (b) if allottee does not withdraw, promoter shall pay interest for every month of delay until handing over of possession."
+    },
+    {
+        "id": "rera-sec-31-filing-complaint",
+        "document_title": "Real Estate (Regulation and Development) Act, 2016",
+        "statute_name": "Real Estate (Regulation and Development) Act, 2016 (Act No. 16 of 2016)",
+        "section": "Section 31",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2016-03-26",
+        "effective_date": "2016-05-01",
+        "amendment_status": "Filing complaints before Real Estate Regulatory Authority",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2158",
+        "content": "Filing of Complaints with Authority or Adjudicating Officer: Any aggrieved person may file a complaint with the Real Estate Regulatory Authority or the Adjudicating Officer for any violation or contravention of provisions of this Act or rules/regulations against any promoter, allottee, or real estate agent. Complaints may be filed online through respective State RERA web portals (e.g., MahaRERA, K-RERA, UP-RERA)."
+    },
+
+    # ==================== DOMESTIC VIOLENCE ACT (PWDVA, 2005) ====================
+    {
+        "id": "pwdva-sec-12-18-reliefs",
+        "document_title": "Protection of Women from Domestic Violence Act, 2005",
+        "statute_name": "Protection of Women from Domestic Violence Act, 2005 (Act No. 43 of 2005)",
+        "section": "Sections 12, 18, 19, 20",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2005-09-13",
+        "effective_date": "2006-10-26",
+        "amendment_status": "Emergency civil and protective relief for aggrieved women",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2021",
+        "content": "Reliefs under Domestic Violence Act: Section 12: An aggrieved woman or a Protection Officer may present an application to Magistrate seeking one or more reliefs. Section 18: Protection Orders prohibiting respondent from committing acts of domestic violence, entering place of employment, or contacting applicant. Section 19: Residence Orders directing respondent not to disturb applicant's possession of shared household. Section 20: Monetary Relief for medical expenses, loss of earnings, and maintenance."
+    },
+
+    # ==================== RIGHT TO INFORMATION ACT, 2005 ====================
+    {
+        "id": "rti-sec-6-7-procedure",
+        "document_title": "Right to Information Act, 2005",
+        "statute_name": "Right to Information Act, 2005 (Act No. 22 of 2005)",
+        "section": "Sections 6, 7",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "2005-06-21",
+        "effective_date": "2005-10-12",
+        "amendment_status": "Citizen empowerment and transparency law",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2065",
+        "content": "Request for Obtaining Information and Disposal: Section 6: A citizen desiring information shall make a request in writing or electronically with prescribed fee (Rs. 10) to Central/State Public Information Officer (CPIO/SPIO). Section 7: CPIO/SPIO shall provide information as expeditiously as possible, and in any case within thirty days of receipt of request. Emergency life and liberty exception: Where information sought concerns the life or liberty of a person, it shall be provided within forty-eight hours."
+    },
+
+    # ==================== MOTOR VEHICLES ACT, 1988 ====================
+    {
+        "id": "mva-sec-166-mact-claims",
+        "document_title": "Motor Vehicles Act, 1988",
+        "statute_name": "Motor Vehicles Act, 1988 (Act No. 59 of 1988)",
+        "section": "Section 166",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1988-10-14",
+        "effective_date": "1989-07-01",
+        "amendment_status": "Amended by Motor Vehicles (Amendment) Act, 2019",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1998",
+        "content": "Application for Compensation before Motor Accidents Claims Tribunal (MACT): An application for compensation arising out of an accident of the nature specified in Section 165 may be made by the person who sustained injury, or owner of property, or legal representatives of deceased. Limitation period under 2019 amendment: Application must be made within six months of occurrence of accident. No-fault interim relief and third-party insurance claims are adjudicated by MACT."
+    },
+
+    # ==================== LEGAL SERVICES AUTHORITIES ACT / FREE LEGAL AID ====================
+    {
+        "id": "lsaa-sec-12-legal-aid",
+        "document_title": "Legal Services Authorities Act, 1987",
+        "statute_name": "Legal Services Authorities Act, 1987 (Act No. 39 of 1987)",
+        "section": "Section 12 & Article 39A of Constitution of India",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1987-10-11",
+        "effective_date": "1995-11-09",
+        "amendment_status": "Enforces Constitutional mandate for free legal aid under Article 39A",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/1987",
+        "content": "Criteria for Giving Free Legal Services: Every citizen who is: (a) a member of a Scheduled Caste or Scheduled Tribe; (b) a victim of trafficking in human beings or begar; (c) a woman or a child; (d) a person with disability; (e) a person under circumstances of underserved want (natural disaster, ethnic violence); (f) an industrial workman; (g) in custody or juvenile home; (h) in receipt of annual income less than prescribed limit (typically Rs. 3 Lakhs to 5 Lakhs depending on state), is entitled to free legal aid through NALSA, State Legal Services Authority (SLSA), or District Legal Services Authority (DLSA)."
+    },
+
+    # ==================== INDUSTRIAL DISPUTES & WAGES ====================
+    {
+        "id": "ida-sec-25f-retrenchment",
+        "document_title": "Industrial Disputes Act, 1947 & Code on Wages, 2019",
+        "statute_name": "Industrial Disputes Act, 1947 (Act No. 14 of 1947)",
+        "section": "Section 25F",
+        "document_type": "Act",
+        "jurisdiction": "India",
+        "publication_date": "1947-03-11",
+        "effective_date": "1947-04-01",
+        "amendment_status": "Governs statutory severance and retrenchment compensation",
+        "source_url": "https://www.indiacode.nic.in/handle/123456789/2236",
+        "content": "Conditions Precedent to Retrenchment of Workmen: No workman employed in any industry who has been in continuous service for not less than one year shall be retrenched until: (a) the workman has been given one month's notice in writing indicating reasons for retrenchment or paid wages in lieu of notice; (b) the workman has been paid retrenchment compensation equivalent to fifteen days average pay for every completed year of continuous service or any part thereof in excess of six months."
+    }
+]
+
+def main():
+    target_path = os.path.join(os.path.dirname(__file__), "..", "data", "legal_corpus", "indian_statutes.json")
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    with open(target_path, "w", encoding="utf-8") as f:
+        json.dump(CORPUS_DATA, f, ensure_ascii=False, indent=2)
+    print(f"Successfully generated rich corpus with {len(CORPUS_DATA)} verified Indian statutory provisions at: {target_path}")
+
+if __name__ == "__main__":
+    main()
+

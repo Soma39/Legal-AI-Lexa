@@ -4,7 +4,7 @@ import {
   Scale, Send, Plus, Trash2, Edit2, Check, X, Copy, 
   ExternalLink, Mic, MicOff, Volume2, VolumeX, ThumbsUp, 
   ThumbsDown, Search, Sparkles, BookOpen, AlertCircle, 
-  ChevronRight, CornerDownLeft, ShieldAlert
+  ChevronRight, CornerDownLeft, ShieldAlert, Download, FileText
 } from 'lucide-react';
 import api from '../services/api';
 import { Conversation, Message, SourceCitation } from '../types';
@@ -253,6 +253,38 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const exportChatTranscript = () => {
+    if (!messages.length) return;
+    let transcript = `# LegalAI Consultation Transcript\n\n`;
+    transcript += `**Topic:** ${activeConv?.topic || 'General Law'}\n`;
+    transcript += `**Jurisdiction:** ${activeConv?.jurisdiction || 'India'}\n`;
+    transcript += `**Date:** ${new Date().toLocaleString()}\n\n`;
+    transcript += `---\n\n`;
+
+    messages.forEach((m) => {
+      transcript += `### ${m.sender === 'user' ? '👤 Citizen Query' : '⚖️ LegalAI Analysis'}\n\n`;
+      transcript += `${m.content}\n\n`;
+      if (m.citations && m.citations.length > 0) {
+        transcript += `**Verified Citations:**\n`;
+        m.citations.forEach((c) => {
+          transcript += `- **${c.statute_name}** (${c.section_or_article || 'Section'}) - [India Code](${c.source_url || 'https://www.indiacode.nic.in/'})\n`;
+        });
+        transcript += `\n`;
+      }
+      transcript += `---\n\n`;
+    });
+
+    const blob = new Blob([transcript], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `LegalAI_Consultation_${(activeConv?.title || 'Chat').replace(/\s+/g, '_')}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const filteredConversations = conversations.filter((c) =>
     c.title.toLowerCase().includes(searchFilter.toLowerCase())
   );
@@ -393,46 +425,77 @@ export const ChatPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          <div className="flex items-center space-x-2">
+            {messages.length > 0 && (
+              <button
+                onClick={exportChatTranscript}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition shadow-sm"
+                title="Export complete legal consultation as Markdown"
+              >
+                <Download className="w-3.5 h-3.5 text-gold-500" />
+                <span className="hidden sm:inline">Export Transcript</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Messages Stream */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4">
+            <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto space-y-4 py-8">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-navy-800 to-navy-950 text-gold-400 flex items-center justify-center shadow-lg">
                 <Scale className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-bold text-navy-900 dark:text-white">
                 How can LegalAI assist you today?
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-light">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-light max-w-lg">
                 Ask specific questions regarding Indian statutory codes, lease agreements, consumer remedies, 
-                cybercrime offences, or criminal procedure. All answers are cited from official Indian legislation.
+                cheque bounce cases, cybercrime, or criminal procedure. All answers are cited from official Indian legislation.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full pt-3 text-left">
                 <button
                   onClick={() => setInputQuery("What is the difference between IPC 420 and BNS 318 for cheating?")}
-                  className="p-3 text-left rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 transition"
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
                 >
-                  BNS 318 vs IPC 420 (Cheating)
+                  <span className="font-bold block text-navy-900 dark:text-white">BNS 318 vs IPC 420</span>
+                  <span className="text-[11px] text-slate-400">Cheating, fraud & punishment under new codes</span>
                 </button>
                 <button
                   onClick={() => setInputQuery("How do I register a Zero FIR under BNSS Section 173?")}
-                  className="p-3 text-left rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 transition"
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
                 >
-                  Zero FIR Procedure (BNSS 173)
+                  <span className="font-bold block text-navy-900 dark:text-white">Zero FIR & e-FIR (BNSS 173)</span>
+                  <span className="text-[11px] text-slate-400">Jurisdiction-free reporting & 3-day signature rule</span>
                 </button>
                 <button
-                  onClick={() => setInputQuery("What is the legal limitation period to file a consumer complaint in India?")}
-                  className="p-3 text-left rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 transition"
+                  onClick={() => setInputQuery("What are the steps and notice timeline for cheque bounce under Section 138 NI Act?")}
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
                 >
-                  Consumer Complaint Limitation
+                  <span className="font-bold block text-navy-900 dark:text-white">Cheque Bounce (NI Act 138)</span>
+                  <span className="text-[11px] text-slate-400">30-day notice, 15-day cure window & court filing</span>
+                </button>
+                <button
+                  onClick={() => setInputQuery("What can a homebuyer do if a builder delays possession under Section 18 of RERA?")}
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
+                >
+                  <span className="font-bold block text-navy-900 dark:text-white">Delayed Flat Possession (RERA)</span>
+                  <span className="text-[11px] text-slate-400">Statutory refund with interest under Section 18</span>
                 </button>
                 <button
                   onClick={() => setInputQuery("What notice period is mandatory under Section 106 of Transfer of Property Act?")}
-                  className="p-3 text-left rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 transition"
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
                 >
-                  Tenancy Notice Period (TPA 106)
+                  <span className="font-bold block text-navy-900 dark:text-white">Tenancy Notice Period (TPA 106)</span>
+                  <span className="text-[11px] text-slate-400">15-day statutory residential lease notice</span>
+                </button>
+                <button
+                  onClick={() => setInputQuery("What is the immediate procedure for online financial fraud and reporting to 1930?")}
+                  className="p-3 rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-xs text-slate-700 dark:text-slate-300 hover:border-gold-400 hover:shadow-sm transition"
+                >
+                  <span className="font-bold block text-navy-900 dark:text-white">Cyber Fraud & Helpline 1930</span>
+                  <span className="text-[11px] text-slate-400">Transaction freeze, IT Act & cybercrime.gov.in</span>
                 </button>
               </div>
             </div>
@@ -457,6 +520,11 @@ export const ChatPage: React.FC = () => {
                         <div className="flex items-center space-x-2 font-bold text-navy-900 dark:text-gold-400">
                           <Scale className="w-3.5 h-3.5" />
                           <span>LegalAI Assistant</span>
+                          {m.confidence_score !== undefined && m.confidence_score !== null && (
+                            <span className="ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300">
+                              {Math.round(m.confidence_score * 100)}% Grounded
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2">
                           {/* Audio TTS Button */}

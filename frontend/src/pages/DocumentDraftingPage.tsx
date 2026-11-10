@@ -114,6 +114,29 @@ export const DocumentDraftingPage: React.FC = () => {
     }
   };
 
+  const downloadDraftFile = async (draftId: string, title: string, format: 'docx' | 'pdf') => {
+    try {
+      const res = await api.get(`/documents/drafts/${draftId}/download/${format}`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], {
+        type: format === 'docx' 
+          ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+          : 'application/pdf',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${title.replace(/\s+/g, '_')}.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download error:', err);
+    }
+  };
+
   const handleSaveEdits = async () => {
     if (!currentDraft) return;
     try {
@@ -346,24 +369,20 @@ export const DocumentDraftingPage: React.FC = () => {
                 <Save className="w-3.5 h-3.5 text-gold-400" />
                 <span>Save Changes</span>
               </button>
-              <a
-                href={`/api/v1/documents/drafts/${currentDraft.id}/download/docx`}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                onClick={() => downloadDraftFile(currentDraft.id, currentDraft.title, 'docx')}
                 className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center space-x-1.5 shadow"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download DOCX</span>
-              </a>
-              <a
-                href={`/api/v1/documents/drafts/${currentDraft.id}/download/pdf`}
-                target="_blank"
-                rel="noreferrer"
+              </button>
+              <button
+                onClick={() => downloadDraftFile(currentDraft.id, currentDraft.title, 'pdf')}
                 className="px-3.5 py-2 rounded-lg bg-gold-500 hover:bg-gold-600 text-navy-950 text-xs font-bold transition flex items-center space-x-1.5 shadow"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 <span>Download PDF</span>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -427,22 +446,18 @@ export const DocumentDraftingPage: React.FC = () => {
 
                   <div className="pt-3 border-t border-slate-100 dark:border-navy-800 flex items-center justify-between text-xs">
                     <div className="flex items-center space-x-2">
-                      <a
-                        href={`/api/v1/documents/drafts/${d.id}/download/docx`}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        onClick={() => downloadDraftFile(d.id, d.title, 'docx')}
                         className="px-2.5 py-1 rounded bg-slate-100 dark:bg-navy-800 hover:bg-slate-200 dark:hover:bg-navy-700 text-slate-700 dark:text-slate-200 font-semibold text-[11px]"
                       >
                         DOCX
-                      </a>
-                      <a
-                        href={`/api/v1/documents/drafts/${d.id}/download/pdf`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-2.5 py-1 rounded bg-gold-50 dark:bg-gold-950/40 text-gold-700 dark:text-gold-400 font-semibold text-[11px]"
+                      </button>
+                      <button
+                        onClick={() => downloadDraftFile(d.id, d.title, 'pdf')}
+                        className="px-2.5 py-1 rounded bg-gold-50 dark:bg-gold-950/40 hover:bg-gold-100 dark:hover:bg-gold-900/60 text-gold-700 dark:text-gold-400 font-semibold text-[11px]"
                       >
                         PDF
-                      </a>
+                      </button>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
